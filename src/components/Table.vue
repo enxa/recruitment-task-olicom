@@ -11,10 +11,9 @@ let props = defineProps({
 
 let { endpoint, search, sortings, pagination, columns } = toRefs(props)
 
-let data = ref([])
-let cols = ref([])
-let entities = ref(new Set([]))
+let ascending = ref(true)
 let error = ref(null)
+let data = ref([])
 
 let fetchData = async url => {
   try {
@@ -26,30 +25,50 @@ let fetchData = async url => {
   }
 }
 
-watchEffect(() => fetchData(endpoint.value))
+let mapColumns = () => {
+  data.value = data.value.map(entity => ({
+    'name': entity.name,
+    'email': entity.email.toLowerCase(),
+    'company.name': entity.company.name, 
+    'address.city': entity.address.city,
+    'website': entity.website.toLowerCase(),
+  }))
+}
 
-watchEffect(() => {
-  data.value.forEach(row => {
-    let entity = []
-    columns.value.forEach(col => {
-      entity.push(eval(`row.${col}`))
-      entities.value.add(entity)
-    })
-  })
+watchEffect(async () => {
+  await fetchData(endpoint.value)
+  await mapColumns()
 })
+
+let handleSort = (column) => {
+  ascending.value = !ascending.value
+  if (ascending.value === true) {
+    data.value.sort((a,b) => (a[column] > b[column]) ? 1 : ((b[column] > a[column]) ? -1 : 0))
+  }
+  if (ascending.value === false) {
+    data.value.sort((a,b) => (b[column] > a[column]) ? 1 : ((a[column] > b[column]) ? -1 : 0))
+  }
+}
 </script>
 
 <template>
   <section class="table">
-    <div v-for="column in columns" :key="column">
-      <button>{{column}}</button>
+    <div class="grid">
+      <button v-for="column in columns" :key="column" v-on:click="handleSort(column)">{{column}}</button>
     </div>
-    <div v-for="entity in entities" :key="entity" class="table">
-      <br>
-      <div v-for="en in entity" :key="en">
-        <span>{{en}}</span>
+    <div class="grid" v-for="item in data" :key="item">
+      <div v-for="column in columns" :key="column">
+        <div v-if="column === 'email'"><a :href="item[column]">{{item[column]}}</a></div>
+        <div v-else>{{item[column]}}</div>
       </div>
       <br>
     </div>
   </section>
 </template>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr)
+  }
+</style>
