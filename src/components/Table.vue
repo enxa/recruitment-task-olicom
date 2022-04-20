@@ -12,8 +12,10 @@ let props = defineProps({
 let { endpoint, search, sortings, pagination, columns } = toRefs(props)
 
 let ascending = ref(true)
-let error = ref(null)
+let searchTerm = ref('')
 let data = ref([])
+let dataFiltered = ref([])
+let error = ref(null)
 
 let fetchData = async url => {
   try {
@@ -21,12 +23,12 @@ let fetchData = async url => {
 		if (!response.ok) error.value = 'Something went wrong'
 		data.value = await response.json()
   } catch (err) {
-    console.error(err.message)
+    error.value = err.message
   }
 }
 
-let mapColumns = () => {
-  data.value = data.value.map(entity => ({
+let mapColumns = async () => {
+  data.value = await data.value.map(entity => ({
     'name': entity.name,
     'email': entity.email.toLowerCase(),
     'company.name': entity.company.name, 
@@ -35,9 +37,23 @@ let mapColumns = () => {
   }))
 }
 
+let searchInTable = async () => {
+  dataFiltered.value = []
+  data.value.forEach(entity => {
+    if (
+      entity['name'].toLowerCase().includes(searchTerm.value.toLowerCase()) || 
+      entity['email'].toLowerCase().includes(searchTerm.value.toLowerCase()) || 
+      entity['company.name'].toLowerCase().includes(searchTerm.value.toLowerCase()) || 
+      entity['address.city'].toLowerCase().includes(searchTerm.value.toLowerCase()) || 
+      entity['website'].toLowerCase().includes(searchTerm.value.toLowerCase())
+    ) dataFiltered.value.push(entity)
+  })
+}
+
 watchEffect(async () => {
   await fetchData(endpoint.value)
   await mapColumns()
+  await searchInTable()
 })
 
 let handleSort = (column) => {
@@ -53,16 +69,20 @@ let handleSort = (column) => {
 
 <template>
   <section class="table">
+    <div class="search" v-if="search">
+      <input type="text" v-model="searchTerm" v-on:input="searchInTable">
+    </div>
     <div class="grid">
       <button v-for="column in columns" :key="column" v-on:click="handleSort(column)">{{column}}</button>
     </div>
-    <div class="grid" v-for="item in data" :key="item">
+    <div class="grid" v-for="item in dataFiltered" :key="item">
       <div v-for="column in columns" :key="column">
         <div v-if="column === 'email'"><a :href="item[column]">{{item[column]}}</a></div>
         <div v-else>{{item[column]}}</div>
       </div>
       <br>
     </div>
+    <div class="error" v-if="error">{{error}}</div>
   </section>
 </template>
 
