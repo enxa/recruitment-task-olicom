@@ -100,9 +100,9 @@ onMounted(() => paginate())
 
 <template>
   <section class="table" v-on:wheel="paginate" v-on:mouseenter.once="paginate">
-    <div class="search" v-if="search">
+    <label class="search" v-if="search">Szukaj: 
       <input type="text" v-model="searchTerm" v-on:input="searchInTable">
-    </div>
+    </label>
     <div class="grid" v-if="sorting">
       <button v-for="column in columns" :key="column" v-on:click="handleSort(column)">{{column}}</button>
     </div>
@@ -110,22 +110,56 @@ onMounted(() => paginate())
       <button v-for="column in columns" :key="column">{{column}}</button>
     </div>
     <div class="grid" v-for="item in dataFiltered" :key="item">
-      <div v-for="column in columns" :key="column">
+      <div class="entity" v-for="column in columns" :key="column">
         <div v-if="column === 'email'"><a :href="item[column]">{{item[column]}}</a></div>
         <div v-else>{{item[column]}}</div>
       </div>
-      <br>
     </div>
     <div class="error" v-if="error">{{error}}</div>
   </section>
 </template>
 
-<style>
+<style scoped>
   .table {
-    min-height: 100vh;
+    padding: 6vh 6vw;
   }
     .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr)
+      border-bottom: 1px solid #eee;
+      padding: 1rem;
     }
+      .entity {
+        padding: 1rem;
+      }
+      button, label {
+        padding: 1rem;
+        margin: 0 1rem 1rem 0;
+        text-align: left;
+        font-size: 1.2rem;
+      }
+      label {
+        display: flex;
+        align-items: center;
+      }
+      .search input {
+        padding: 1rem;
+        margin: 1rem;
+        font-size: 1.2rem;
+        background: #eee;
+      }
+
+  @media (min-width: 800px) {
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr)
+    }
+  }
+  
+  @media (min-width: 1600px) {
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border: none;
+      padding: 0;
+    }
+  }
 </style>

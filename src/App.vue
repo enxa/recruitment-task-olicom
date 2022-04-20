@@ -8,7 +8,7 @@ let sorting = ref(true)
 let pagination = ref(true)
 let columns = ref(['name', 'email', 'company.name', 'address.city', 'website'])
 
-let emitChange = (e) => console.log(e)
+let emitChange = (e) => console.log('change', e)
 </script>
 
 <template>
@@ -20,3 +20,15 @@ let emitChange = (e) => console.log(e)
     :columns="columns" 
   />
 </template>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+  }
+</style>
