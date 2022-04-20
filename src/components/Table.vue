@@ -18,8 +18,6 @@ let ascending = ref(true)
 let searchTerm = ref('')
 let data = ref([])
 let dataFiltered = ref([])
-let dataPaginated = ref([])
-let pageIndex = ref(0)
 let error = ref(null)
 
 let fetchData = async url => {
@@ -57,31 +55,11 @@ let searchInTable = () => {
   })
   emit('change', dataFiltered.value)
 }
-
-let paginate = (e) => {
-  // if (pagination) {
-  //   let perPage = 3
-  //   let pages = []
-  //   for (let i = 0; i < dataFiltered.value.length; i += perPage) {
-  //     let page = dataFiltered.value.slice(i, i + perPage);
-  //     pages.push(page)
-  //   }
-
-  //   if (e.deltaY >= 0 && pageIndex.value >= 0 && pageIndex.value < pages.length - 1) pageIndex.value += 1
-  //   if (e.deltaY < 0 && pageIndex.value > 0 && pageIndex.value <= pages.length - 1) pageIndex.value -= 1
-
-  //   dataPaginated.value = pages[pageIndex.value] || pages[0]
-  //   console.log(dataPaginated.value)
-  // } else {
-  //   dataPaginated.value = dataFiltered.value
-  // }
-}
     
 watchEffect(async () => {
   await fetchData(endpoint.value)
   await mapColumns()
   await searchInTable()
-  // await paginate()
 })
 
 let handleSort = (column) => {
