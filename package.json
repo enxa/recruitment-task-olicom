@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "serve": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve", 
+    "start": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve", 
     "build": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
     "lint": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint"
   },
@@ -24,13 +24,15 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
+      "plugin:vue/essential",
       "eslint:recommended"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "no-unused-vars": "off" 
+    }
   },
   "browserslist": [
     "> 1%",
